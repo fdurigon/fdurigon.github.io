@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fdurigon — projetos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #0d0d0d;
+      --surface:   #161616;
+      --border:    #2a2a2a;
+      --accent:    #e8c96d;
+      --accent2:   #6db4e8;
+      --text:      #e0e0e0;
+      --muted:     #555;
+      --green:     #6de88a;
+      --red:       #e86d6d;
+      --pixel:     2px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      line-height: 1.8;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── scanlines overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,.18) 3px,
+        rgba(0,0,0,.18) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ── header ── */
+    header {
+      border-bottom: var(--pixel) solid var(--border);
+      padding: 32px 40px 24px;
+      display: flex;
+      align-items: flex-end;
+      gap: 24px;
+    }
+
+    .avatar {
+      width: 64px;
+      height: 64px;
+      image-rendering: pixelated;
+      border: var(--pixel) solid var(--accent);
+      flex-shrink: 0;
+    }
+
+    .header-text {}
+
+    .header-text h1 {
+      font-size: 18px;
+      color: var(--accent);
+      text-shadow: 3px 3px 0 #7a6020;
+      margin-bottom: 8px;
+    }
+
+    .header-text p {
+      font-size: 8px;
+      color: var(--muted);
+    }
+
+    .blink {
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── nav breadcrumb ── */
+    nav {
+      padding: 12px 40px;
+      font-size: 8px;
+      color: var(--muted);
+      border-bottom: var(--pixel) solid var(--border);
+    }
+    nav span { color: var(--accent2); }
+
+    /* ── main grid ── */
+    main {
+      padding: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-size: 9px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: var(--pixel);
+      background: var(--border);
+    }
+
+    /* ── project grid ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    /* ── card ── */
+    .card {
+      background: var(--surface);
+      border: var(--pixel) solid var(--border);
+      position: relative;
+      cursor: pointer;
+      transition: border-color .15s, transform .15s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      /* pixel-shadow */
+      box-shadow: var(--pixel) var(--pixel) 0 #000;
+    }
+
+    .card:hover {
+      border-color: var(--accent);
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 #000;
+    }
+
+    .card:hover .card-thumb-overlay {
+      opacity: 0;
+    }
+
+    /* thumbnail area */
+    .card-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #111;
+      position: relative;
+      overflow: hidden;
+      border-bottom: var(--pixel) solid var(--border);
+    }
+
+    .card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+      display: block;
+    }
+
+    /* placeholder when no screenshot */
+    .thumb-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      background: #0a0a12;
+      background-image:
+        linear-gradient(rgba(109,180,232,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(109,180,232,.04) 1px, transparent 1px);
+      background-size: 16px 16px;
+    }
+
+    .card-thumb-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: var(--muted);
+      transition: opacity .2s;
+    }
+
+    /* card body */
+    .card-body {
+      padding: 16px;
+    }
+
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 10px;
+      color: var(--accent);
+    }
+
+    .card-status {
+      font-size: 7px;
+      padding: 3px 6px;
+      border: var(--pixel) solid currentColor;
+    }
+    .status-wip    { color: var(--accent); }
+    .status-done   { color: var(--green); }
+    .status-idea   { color: var(--muted); }
+
+    .card-desc {
+      font-size: 7px;
+      color: #888;
+      margin-bottom: 14px;
+      line-height: 2;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      font-size: 6px;
+      color: var(--accent2);
+      border: 1px solid var(--accent2);
+      padding: 2px 5px;
+      opacity: .7;
+    }
+
+    /* ── "add project" placeholder card ── */
+    .card-add {
+      border-style: dashed;
+      border-color: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: unset;
+      min-height: 180px;
+      opacity: .4;
+      cursor: default;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 8px;
+      color: var(--muted);
+    }
+    .card-add:hover {
+      border-color: var(--border);
+      transform: none;
+      box-shadow: var(--pixel) var(--pixel) 0 #000;
+    }
+    .card-add span { font-size: 24px; }
+
+    /* ── footer ── */
+    footer {
+      border-top: var(--pixel) solid var(--border);
+      padding: 20px 40px;
+      font-size: 7px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    footer a {
+      color: var(--accent2);
+      text-decoration: none;
+    }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── responsive ── */
+    @media (max-width: 600px) {
+      header { padding: 20px; flex-direction: column; align-items: flex-start; }
+      nav, main { padding: 20px; }
+      .header-text h1 { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <!-- pixel avatar gerado via svg inline -->
+    <svg class="avatar" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+      <rect width="16" height="16" fill="#0d0d0d"/>
+      <!-- hair -->
+      <rect x="4" y="1" width="8" height="2" fill="#3a2a1a"/>
+      <rect x="3" y="3" width="10" height="1" fill="#3a2a1a"/>
+      <!-- face -->
+      <rect x="4" y="3" width="8" height="6" fill="#c8956c"/>
+      <!-- eyes -->
+      <rect x="5" y="5" width="2" height="2" fill="#1a1a1a"/>
+      <rect x="9" y="5" width="2" height="2" fill="#1a1a1a"/>
+      <!-- mouth -->
+      <rect x="6" y="8" width="4" height="1" fill="#7a4030"/>
+      <!-- ears -->
+      <rect x="3" y="5" width="1" height="2" fill="#b07a55"/>
+      <rect x="12" y="5" width="1" height="2" fill="#b07a55"/>
+      <!-- body -->
+      <rect x="3" y="10" width="10" height="6" fill="#2a4a7a"/>
+      <!-- collar -->
+      <rect x="6" y="10" width="4" height="2" fill="#e0e0e0"/>
+    </svg>
+
+    <div class="header-text">
+      <h1>fdurigon<span class="blink">_</span></h1>
+      <p>// projetos web · experimentos · jogos</p>
+    </div>
+  </header>
+
+  <nav>
+    <span>~/projetos</span> &nbsp;›&nbsp; index
+  </nav>
+
+  <main>
+    <p class="section-title">// projetos ativos</p>
+
+    <div class="projects-grid" id="projects-grid">
+
+      <!-- ── COLD CASE ── -->
+      <a class="card" href="https://fdurigon.github.io/cold-case" target="_blank" rel="noopener">
+        <div class="card-thumb">
+          <div class="thumb-placeholder">🔍</div>
+          <div class="card-thumb-overlay">[ clique para abrir ]</div>
+        </div>
+        <div class="card-body">
+          <div class="card-header-row">
+            <span class="card-title">cold-case</span>
+            <span class="card-status status-wip">WIP</span>
+          </div>
+          <p class="card-desc">
+            jogo de investigação criminal.<br/>
+            resolva casos analisando pistas,<br/>
+            interrogando suspeitos e<br/>
+            montando o dossiê.
+          </p>
+          <div class="card-tags">
+            <span class="tag">phaser 3</span>
+            <span class="tag">javascript</span>
+            <span class="tag">pixel art</span>
+            <span class="tag">game</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- ── PLACEHOLDER: próximo projeto ── -->
+      <div class="card card-add">
+        <span>+</span>
+        próximo projeto
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <span>© 2026 fdurigon</span>
+    <span>
+      <a href="https://github.com/fdurigon" target="_blank">github</a>
+      &nbsp;·&nbsp;
+      feito com 8 bits de amor
+    </span>
+  </footer>
+
+</body>
+</html>
